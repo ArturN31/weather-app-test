@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Weather Explorer - Next.js Weather Application
 
-## Getting Started
+## Overview
 
-First, run the development server:
+This is a responsive, web-based application built with Next.js that provides current weather information and a five-day forecast for any location, using an open weather API. It is designed with a mobile-first approach and uses client-side storage to remember recent searches.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Tech Stack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This project is built using the latest stable and recommended technologies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Framework**: Next.js (App Router)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Language**: TypeScript
 
-## Learn More
+**UI**: React, Material UI
 
-To learn more about Next.js, take a look at the following resources:
+**Styling**: Tailwind CSS
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Code Quality**: ESLint
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Getting Started
 
-## Deploy on Vercel
+To run the Next.js application, follow these steps to prepare the environment and start the server.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### 1. Prerequisites & Installation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Ensure you have Node.js (version 18.x or later) and npm installed.
+
+Clone the repository and install the dependencies:
+
+`git clone [YOUR-REPO-LINK] weather-app-test`
+
+`cd weather-app-test`
+
+`npm install`
+
+#### 2. API Key Configuration (Crucial Step)
+
+As required, all external API calls are proxied through a Next.js server route to secure the API key.
+
+- Obtain an API key from a weather provider (e.g., OpenWeatherMap).
+
+- Create a file named `.env.local` in the root of the project directory.
+
+- Add your key to the file using the variable name defined below:
+
+  `WEATHER_API_KEY="YOUR_API_KEY_HERE"`
+
+#### 3. Run the Development Server
+
+Start the application in development mode:
+
+`npm run dev`
+
+Open http://localhost:3000 in your web browser to see the result.
+
+### Deliverables & Key Decisions
+
+### Trade-offs and Limitations
+
+### Potential Improvements / Further work

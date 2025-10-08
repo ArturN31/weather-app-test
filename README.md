@@ -76,6 +76,15 @@ The utility module (`/api/weather/utils.ts`) is dedicated to transforming the ra
 
 This endpoint is responsible for taking a user's location search (city or postcode), validating it using Zod, and securely converting it into the precise latitude and longitude coordinates required for the weather API. It acts as a secure server-side proxy for the OpenWeatherMap Geocoding service.
 
+### 4. Client-Side UX
+
+Main Layout prioritises visual fluidity and input usability:
+
+**Sidebar usability**:
+
+- A dynamic City/Postcode toggle was implemented under the search bar. This ensures input clarity by updating the search bar's placeholder text based on the selected mode, reducing user error in form submission.
+- The "Open Sidebar" button's state has a 500ms delay via setTimeout. Implemented to precisely match the CSS transition duration, guaranteeing a smooth entry of the button into the viewport.
+
 ## Trade-offs and Limitations
 
 ### 1. API Endpoint

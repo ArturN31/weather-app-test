@@ -13,22 +13,30 @@ interface ForecastItem {
 		temp: number;
 		temp_min: number;
 		temp_max: number;
+		humidity: number;
 	};
 	weather: Array<{
 		description: string;
 		main: string;
+		icon: string;
 	}>;
+	wind: {
+		speed: number;
+	};
 	dt_txt: string; // Time of data forecasted, ISO, UTC
 }
 
 // represents the final forecast summary for a single calendar day
 interface DailyForecastSummary {
 	date: string;
+	humidity: number;
+	wind_speed: number;
 	avg_temp: number;
 	min_temp: number;
 	max_temp: number;
 	condition: string;
 	description: string;
+	icon: string;
 	hourly_data: ForecastItem[];
 }
 
@@ -42,8 +50,11 @@ const groupForecastByDay = (forecastList: ForecastItem[]): DailyForecastSummary[
 		const date = item.dt_txt.substring(0, 10);
 		const condition = item.weather[0].main;
 		const description = item.weather[0].description;
+		const icon = item.weather[0].icon;
 		const minTemp = item.main.temp_min;
 		const maxTemp = item.main.temp_max;
+		const humidity = item.main.humidity;
+		const windSpeed = item.wind.speed;
 
 		let dailySummary = dailyMap.get(date);
 
@@ -51,11 +62,14 @@ const groupForecastByDay = (forecastList: ForecastItem[]): DailyForecastSummary[
 		if (!dailySummary) {
 			dailySummary = {
 				date: date,
+				humidity: humidity,
+				wind_speed: windSpeed,
 				min_temp: minTemp,
 				max_temp: maxTemp,
 				avg_temp: 0,
 				condition: condition,
 				description: description,
+				icon: icon,
 				hourly_data: [],
 			};
 			dailyMap.set(date, dailySummary);
@@ -137,11 +151,14 @@ export function processToDailySummaryObject(
 
 	dailySummaries.forEach((day) => {
 		forecasts[day.date] = {
+			humidity: day.humidity,
+			windSpeed: day.wind_speed,
 			minTemp: day.min_temp,
 			maxTemp: day.max_temp,
 			avgTemp: day.avg_temp,
 			condition: day.condition,
 			description: day.description,
+			iconURL: `https://openweathermap.org/img/wn/${day.icon}@2x.png`,
 		};
 	});
 

@@ -56,6 +56,42 @@ Open http://localhost:3000 in your web browser to see the result.
 
 ## Deliverables & Key Decisions
 
+### 1. Zod-Validated API Endpoint - Weather forecast (/api/weather)
+
+This API endpoint provides weather forecast data and is built for security and scalability through input validation. The central architectural decision was either using a library like Zod or implement custom if checks.
+
+Usage of Zod allowed all validation rules to be defined in a single, highly readable schema, guaranteeing that only truly valid and correctly typed coordinate numbers are processed.
+
+For improved client debugging and a better user experience (UX), the endpoint employs granular error reporting and precise HTTP status codes.
+
+### 2. Data Transformation & Aggregation (/api/weather/utils.ts)
+
+The utility module (`/api/weather/utils.ts`) is dedicated to transforming the raw 3-hour API data into the required 5-day daily forecast. This separation keeps the API route handler clean. The module performs key aggregation steps for each day:
+
+- grouping all hourly data determining the absolute minimum and maximum temperatures (`min_temp`, `max_temp`),
+- calculating the average temperature (arithmetic mean),
+- and finding the dominant weather condition and description using frequency counting for a single, brief daily summary.
+
+### 3. Geolocation API Endpoint (/api/geolocation)
+
+This endpoint is responsible for taking a user's location search (city or postcode), validating it using Zod, and securely converting it into the precise latitude and longitude coordinates required for the weather API. It acts as a secure server-side proxy for the OpenWeatherMap Geocoding service.
+
 ## Trade-offs and Limitations
+
+### 1. API Endpoint
+
+- **External Service Failure (Limitation)**: The application remains dependent on third-party uptime.
+
+### 2. Data Accuracy and Aggregation Method (/api/weather/utils.ts)
+
+- **Dominant Condition (Trade-off)**: The daily weather summary relies on frequency counting, not weather severity.
+
+- **Temperature Metrics (Trade-off)**: Average Temperature is a simple arithmetic mean of 3-hour points.
+
+- **Daily Grouping (Limitation)**: Daily grouping is strictly based on the API's UTC date string.
+
+### 3. Geolocation Specificity and Scope
+
+- **Multiple City Results (Limitation)**: The Geocoding API for city names can return up to five locations with the same name. The front-end must be designed to handle this array and potentially prompt the user to select the correct location.
 
 ## Potential Improvements / Further work

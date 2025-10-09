@@ -85,6 +85,11 @@ Main Layout prioritises visual fluidity and input usability:
 - A dynamic City/Postcode toggle was implemented under the search bar. This ensures input clarity by updating the search bar's placeholder text based on the selected mode, reducing user error in form submission.
 - The "Open Sidebar" button's state has a 500ms delay via setTimeout. Implemented to precisely match the CSS transition duration, guaranteeing a smooth entry of the button into the viewport.
 
+### 5. Clientside Architecture
+
+- The `GeolocationSearchContext` provider completely isolates all geocoding logic (input state, debouncing, API call, loading status, and error messages) from the main UI components. This is a crucial architectural decision that makes the logic unit-testable outside of the React rendering environment.
+- The provider uses the `useDebounce` with a 500ms delay on the `searchbarLocation` state. This prevents excessive and costly API calls while the user is actively typing, optimising resource usage and avoiding potential API rate limits.
+
 ## Trade-offs and Limitations
 
 ### 1. API Endpoint
@@ -99,8 +104,9 @@ Main Layout prioritises visual fluidity and input usability:
 
 - **Daily Grouping (Limitation)**: Daily grouping is strictly based on the API's UTC date string.
 
-### 3. Geolocation Specificity and Scope
+### 3. Geolocation
 
 - **Multiple City Results (Limitation)**: The Geocoding API for city names can return up to five locations with the same name. The front-end must be designed to handle this array and potentially prompt the user to select the correct location.
+- **Immediate Geolocation Failures (Limitation)**: The `MyLocationBtn` provides immediate feedback to the user on basic browser permission denial ("Sorry, no position available.") or feature absence ("Geolocation is not supported"). However, it performs no retries or advanced error handling, immediately aborting the attempt upon the first failure.
 
 ## Potential Improvements / Further work

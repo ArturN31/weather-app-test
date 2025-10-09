@@ -5,7 +5,7 @@ export const prepGeolocationApiUrl = (
 ) => {
 	const baseUrl = 'http://api.openweathermap.org/geo/1.0';
 	const countryCode = 'GB';
-	const outputLimit = 5;
+	const outputLimit = 1;
 	const encodedLocationQuery = encodeURIComponent(locationQuery);
 
 	if (queryToggle.toLocaleLowerCase() === 'city') {

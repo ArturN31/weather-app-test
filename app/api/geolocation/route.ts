@@ -77,9 +77,37 @@ export async function POST(request: Request) {
 			);
 		}
 
-		const geolocationData = await response.json();
+		const rawGeolocationData: {
+			lat: number;
+			lon: number;
+		} = await response.json();
 
-		return new Response(JSON.stringify(geolocationData), {
+		let safeGeolocationData: { lat: number; lon: number }[];
+
+		if (Array.isArray(rawGeolocationData)) {
+			safeGeolocationData = rawGeolocationData;
+		} else if (rawGeolocationData && typeof rawGeolocationData === 'object') {
+			safeGeolocationData = [rawGeolocationData];
+		} else {
+			safeGeolocationData = [];
+		}
+
+		if (safeGeolocationData.length === 0) {
+			console.error('External API returned no results after standardization.');
+			return new Response(
+				JSON.stringify({
+					message: 'Could not identify appropriate location.',
+				}),
+				{ status: 404, headers: { 'Content-Type': 'application/json' } },
+			);
+		}
+
+		const returnObject: Coordinates = {
+			latitude: safeGeolocationData[0].lat,
+			longitude: safeGeolocationData[0].lon,
+		};
+
+		return new Response(JSON.stringify(returnObject), {
 			status: 200,
 			headers: {
 				'Content-Type': 'application/json',

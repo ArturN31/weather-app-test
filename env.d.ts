@@ -12,4 +12,16 @@ interface DailyForecastOutput {
 			iconURL: string;
 		};
 	};
+	message: string;
+}
+
+interface CoordinatesOutput {
+	latitude: number;
+	longitude: number;
+	message: string;
+}
+
+interface Coordinates {
+	latitude: number | null;
+	longitude: number | null;
 }

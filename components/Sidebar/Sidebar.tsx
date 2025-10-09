@@ -4,6 +4,7 @@ import { MyLocationBtn } from './Content/MyLocationBtn';
 import { Recents } from './Content/Recents';
 import { CloseSidebarBtn } from './CloseSidebarBtn';
 import { OpenSidebarBtn } from './OpenSidebarBtn';
+import { useGeolocationSearch } from '@/utils/providers/GeolocationSearchContext';
 
 export const Sidebar = ({
 	isSidebarOpen,
@@ -13,10 +14,12 @@ export const Sidebar = ({
 	toggleSidebar: () => void;
 }) => {
 	const [showOpenButton, setShowOpenButton] = useState(!isSidebarOpen);
-	const [searchType, setSearchType] = useState<'city' | 'postcode'>('city');
+
+	const { geolocationRetrievalMessage, geolocationRetrievalPending } =
+		useGeolocationSearch();
 
 	useEffect(() => {
-		let timeoutId: string | number | NodeJS.Timeout | undefined;
+		let timeoutId: NodeJS.Timeout;
 
 		if (isSidebarOpen) {
 			setShowOpenButton(false);
@@ -45,10 +48,20 @@ export const Sidebar = ({
 					</h2>
 
 					<div className='grid gap-3 py-10'>
-						<Searchbar
-							searchType={searchType}
-							setSearchType={setSearchType}
-						/>
+						{geolocationRetrievalPending && (
+							<div className='text-center'>
+								<p className='text-sm'>{geolocationRetrievalPending}</p>
+							</div>
+						)}
+
+						{geolocationRetrievalMessage && (
+							<div className='text-center'>
+								<p className='font-bold'>Attention:</p>
+								<p className='text-sm'>{geolocationRetrievalMessage}</p>
+							</div>
+						)}
+
+						<Searchbar />
 
 						<p className='text-center text-sm'>or</p>
 

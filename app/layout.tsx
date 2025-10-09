@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { GeolocationSearchProvider } from '@/utils/providers/GeolocationSearchContext';
 
 export const metadata: Metadata = {
 	title: 'Weather Application',
@@ -12,8 +13,10 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang='en'>
-			<body className='antialiased'>{children}</body>
-		</html>
+		<GeolocationSearchProvider>
+			<html lang='en'>
+				<body className='antialiased'>{children}</body>
+			</html>
+		</GeolocationSearchProvider>
 	);
 }

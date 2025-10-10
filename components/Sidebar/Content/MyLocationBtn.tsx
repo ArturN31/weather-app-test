@@ -4,7 +4,7 @@ import { useState } from 'react';
 export const MyLocationBtn = () => {
 	const [notification, setNotification] = useState('');
 
-	const { handleLocationCoordinates, handleSearchbarLocation } = useGeolocationSearch();
+	const { handleSearchResult } = useGeolocationSearch();
 
 	const handleClick = () => {
 		if (navigator.geolocation) {
@@ -20,8 +20,7 @@ export const MyLocationBtn = () => {
 			longitude: position.coords.longitude,
 		};
 
-		handleLocationCoordinates(coords);
-		handleSearchbarLocation('');
+		handleSearchResult('', coords);
 		setNotification('');
 	};
 
@@ -35,7 +34,7 @@ export const MyLocationBtn = () => {
 				className='border-2 border-gray-400 px-2 py-2 w-full bg-[#6B0504] hover:bg-[#970b09] transition text-gray-200 font-semibold rounded-full shadow-lg hover:cursor-pointer'>
 				Use My Location
 			</button>
-			{notification && <p>{notification}</p>}
+			{notification && <p className='text-sm text-red-400 mt-2'>{notification}</p>}
 		</div>
 	);
 };

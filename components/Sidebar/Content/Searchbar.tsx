@@ -4,6 +4,7 @@ export const Searchbar = () => {
 	const {
 		searchbarLocation,
 		searchbarLocationType,
+		geolocationRetrievalPending,
 		handleSearchbarLocation,
 		handleSearchbarLocationType,
 	} = useGeolocationSearch();
@@ -22,6 +23,7 @@ export const Searchbar = () => {
 				placeholder={`Enter ${
 					searchbarLocationType === 'city' ? 'City Name' : 'Postcode'
 				}...`}
+				disabled={geolocationRetrievalPending}
 				className='border border-gray-600 bg-black/40 text-gray-200 placeholder:text-gray-500 px-3 py-2 rounded-full shadow-inner focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition'
 			/>
 			<div className='flex justify-center p-1 bg-black/20 rounded-full border border-gray-700'>

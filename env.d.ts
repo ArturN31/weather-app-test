@@ -25,3 +25,14 @@ interface Coordinates {
 	latitude: number | null;
 	longitude: number | null;
 }
+
+interface StoredLocation {
+	location: string;
+	toggle: 'city' | 'postcode';
+	coords: Coordinates;
+}
+
+interface SearchResult {
+	location: string;
+	coords: Coordinates;
+}

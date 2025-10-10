@@ -84,11 +84,13 @@ Main Layout prioritises visual fluidity and input usability:
 
 - A dynamic City/Postcode toggle was implemented under the search bar. This ensures input clarity by updating the search bar's placeholder text based on the selected mode, reducing user error in form submission.
 - The "Open Sidebar" button's state has a 500ms delay via setTimeout. Implemented to precisely match the CSS transition duration, guaranteeing a smooth entry of the button into the viewport.
+- A list of recent searches with unlimited storage, but limited display to preserve all user history while preventing UI clutter. The `useRecentSearches` hook stores all successful searches in `localStorage`. The locations are displayed as pills with keyboard navigation.
 
 ### 5. Clientside Architecture
 
 - The `GeolocationSearchContext` provider completely isolates all geocoding logic (input state, debouncing, API call, loading status, and error messages) from the main UI components. This is a crucial architectural decision that makes the logic unit-testable outside of the React rendering environment.
 - The provider uses the `useDebounce` with a 500ms delay on the `searchbarLocation` state. This prevents excessive and costly API calls while the user is actively typing, optimising resource usage and avoiding potential API rate limits.
+- The `useRecentSearches` hook implemented to manage the history of succesful location lookups. It synchronizes the state with `localStorage`, including logic to safely handle JSON parsing errors and prevent rendering issues.
 
 ## Trade-offs and Limitations
 

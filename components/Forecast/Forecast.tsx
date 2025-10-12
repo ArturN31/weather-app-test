@@ -1,22 +1,84 @@
 import { useGeolocationSearch } from '@/utils/providers/GeolocationSearchContext';
-import { useEffect } from 'react';
+import { ForecastLayout } from './ForecastLayout';
+import { ForecastStatus } from './Status/ForecastStatus';
+import { ForecastCard } from './ForecastCard';
+import { ForecastOutlook } from './ForecastOutlook';
 
 export const Forecast = ({ isSidebarOpen }: { isSidebarOpen: boolean }) => {
-	const { searchResult } = useGeolocationSearch();
+	const {
+		searchResult,
+		forecastData,
+		forecastRetrievalMessage,
+		forecastRetrievalPending,
+	} = useGeolocationSearch();
 
-	useEffect(() => {
-		//TODO: retrieve the forecast using coordinates
-		console.log('Final coordinates ready for forecast:', searchResult);
-	}, [searchResult]);
+	const locationName = forecastData
+		? forecastData.location.name
+		: searchResult.location || 'Unknown Location';
+
+	const dailyForecasts = forecastData ? Object.values(forecastData.forecasts) : [];
+	const hasSearched = !!searchResult.location;
+
+	let content;
+
+	// PENDING/ERROR STATE
+	if (forecastRetrievalMessage || forecastRetrievalPending) {
+		content = (
+			<ForecastStatus
+				isPending={forecastRetrievalPending}
+				message={forecastRetrievalMessage}
+				hasSearched={hasSearched}
+			/>
+		);
+	}
+	// NO DATA STATE
+	else if (!forecastData || dailyForecasts.length === 0) {
+		content = (
+			<ForecastStatus
+				isPending={false}
+				message={forecastData ? `No forecast available for ${locationName}.` : ''}
+				hasSearched={hasSearched}
+			/>
+		);
+	}
+	// DATA AVAILABLE STATE
+	else {
+		const today = dailyForecasts[0];
+		const outlook = dailyForecasts.slice(1);
+
+		content = (
+			<div className='mt-8 space-y-10'>
+				<h1
+					className='sr-only'
+					id='main-forecast-heading'>
+					Weather Forecast for {locationName}
+				</h1>
+
+				<ForecastCard
+					today={today}
+					index={-1}
+					locationName={locationName}
+				/>
+
+				{outlook.length > 0 && (
+					<ForecastOutlook
+						dailyForecasts={outlook}
+						locationName={locationName}
+					/>
+				)}
+			</div>
+		);
+	}
 
 	return (
 		<main
-			className={`flex-1 p-10 pl-[130px] pr-[130px] transition-all duration-500 ease-in-out ${
-				isSidebarOpen ? 'md:ml-[400px] md:pl-10 md:pr-10' : 'ml-0 mr-0'
-			}`}>
-			<h1 className={`text-4xl font-bold text-gray-400 border-b border-gray-500 pb-2`}>
-				Weather Display Area
-			</h1>
+			className='grid mx-auto'
+			aria-labelledby={forecastData ? 'main-forecast-heading' : undefined}>
+			<ForecastLayout
+				locationName={!forecastData && !hasSearched ? '' : locationName}
+				isSidebarOpen={isSidebarOpen}>
+				{content}
+			</ForecastLayout>
 		</main>
 	);
 };

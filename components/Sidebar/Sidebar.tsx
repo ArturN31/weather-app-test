@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Searchbar } from './Content/Searchbar';
 import { MyLocationBtn } from './Content/MyLocationBtn';
-import { Recents } from './Content/Recents';
+import { Recents } from './Content/Recents/Recents';
 import { CloseSidebarBtn } from './CloseSidebarBtn';
 import { OpenSidebarBtn } from './OpenSidebarBtn';
 import { useGeolocationSearch } from '@/utils/providers/GeolocationSearchContext';
@@ -37,7 +37,12 @@ export const Sidebar = ({
 			{showOpenButton && <OpenSidebarBtn toggleSidebar={toggleSidebar} />}
 
 			<aside
-				className={`fixed top-0 left-0 h-screen w-full sm:w-[400px] p-10 z-10 bg-[#004d40] text-gray-100 shadow-2xl shadow-[#004d40]/90 border-r border-gray-500 transition-transform duration-500 ease-in-out ${
+				id='weather-sidebar'
+				role='region'
+				aria-label='Search and Recent Locations'
+				aria-hidden={!isSidebarOpen}
+				tabIndex={isSidebarOpen ? 0 : -1}
+				className={`fixed top-0 left-0 h-screen w-full sm:w-[400px] p-10 z-50 bg-[#004d40] text-gray-100 shadow-2xl shadow-[#004d40]/90 border-r border-gray-500 transition-transform duration-500 ease-in-out ${
 					isSidebarOpen ? 'translate-x-0' : '-translate-x-full shadow-none'
 				}`}>
 				<div className='w-full max-w-sm mx-auto grid gap-5'>
@@ -49,13 +54,19 @@ export const Sidebar = ({
 
 					<div className='grid gap-3 py-10'>
 						{geolocationRetrievalPending && (
-							<div className='text-center'>
+							<div
+								className='text-center'
+								role='status'
+								aria-live='polite'>
 								<p className='text-sm'>{geolocationRetrievalPending}</p>
 							</div>
 						)}
 
 						{geolocationRetrievalMessage && (
-							<div className='text-center'>
+							<div
+								className='text-center'
+								role='alert'
+								aria-live='assertive'>
 								<p className='font-bold'>Attention:</p>
 								<p className='text-sm'>{geolocationRetrievalMessage}</p>
 							</div>
@@ -63,7 +74,11 @@ export const Sidebar = ({
 
 						<Searchbar />
 
-						<p className='text-center text-sm'>or</p>
+						<p
+							className='text-center text-sm'
+							aria-hidden='true'>
+							or
+						</p>
 
 						<MyLocationBtn />
 					</div>

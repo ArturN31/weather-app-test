@@ -8,8 +8,8 @@ import {
 	ReactNode,
 	useEffect,
 } from 'react';
-import { useDebounce } from '../useDebounce';
-import { useRecentSearches } from '../useRecentSearches';
+import { useDebounce } from '../hooks/useDebounce';
+import { useRecentSearches } from '../hooks/useRecentSearches';
 
 interface GeolocationContextValue {
 	searchbarLocation: string;
@@ -19,6 +19,9 @@ interface GeolocationContextValue {
 	geolocationRetrievalMessage: string;
 	recentSearches: StoredLocation[];
 	isRecentsLoaded: boolean;
+	forecastData: DailyForecastOutput | null;
+	forecastRetrievalPending: boolean;
+	forecastRetrievalMessage: string;
 	handleSearchbarLocation: (location: string) => void;
 	handleSearchbarLocationType: (type: 'city' | 'postcode') => void;
 	handleSearchResult: (location: string, coords: Coordinates) => void;
@@ -45,6 +48,10 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 	const [recentSearches, setRecentSearches, isRecentsLoaded] = useRecentSearches<
 		StoredLocation[]
 	>('recent_location_searches', []);
+
+	const [forecastData, setForecastData] = useState<DailyForecastOutput | null>(null);
+	const [forecastRetrievalPending, setForecasRetrievalPending] = useState(false);
+	const [forecastRetrievalMessage, setForecasRetrievalMessage] = useState('');
 
 	// adjust the delay value if necessary
 	const debouncedLocation = useDebounce(searchbarLocation, 1000);
@@ -113,6 +120,10 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 			setGeolocationRetrievalPending(true);
 			setGeolocationRetrievalMessage('Data retrieval pending.');
 
+			setForecastData(null);
+			setForecasRetrievalPending(false);
+			setForecasRetrievalMessage('');
+
 			try {
 				const response = await fetch('/api/geolocation', {
 					method: 'POST',
@@ -153,6 +164,46 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 		},
 		[handleSearchResult],
 	);
+
+	const getForecast = useCallback(async (coords: Coordinates) => {
+		if (typeof coords.latitude !== 'number' || typeof coords.longitude !== 'number')
+			return;
+
+		setForecasRetrievalPending(true);
+		setForecasRetrievalMessage('Data retrieval pending.');
+
+		try {
+			const response = await fetch('/api/weather', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					latitude: coords.latitude,
+					longitude: coords.longitude,
+				}),
+			});
+
+			const data: DailyForecastOutput = await response.json();
+
+			if (!response.ok || data.message) {
+				const errorMsg =
+					data.message || `Server error: ${response.status} ${response.statusText}`;
+				setForecasRetrievalMessage(errorMsg);
+				setForecasRetrievalPending(false);
+				return;
+			}
+
+			setForecastData(data);
+			setForecasRetrievalPending(false);
+			setForecasRetrievalMessage('');
+		} catch (e) {
+			console.log(`Error retrieving forecast: ${e}`);
+			setForecasRetrievalMessage('A critical network error occurred.');
+			setForecasRetrievalPending(false);
+			setForecastData(null);
+		}
+	}, []);
 
 	// handling coordinates retrieval - triggered after debounce
 	useEffect(() => {
@@ -199,6 +250,19 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 		});
 	}, [debouncedLocation, searchbarLocationType, updateRecentSearches, searchResult]);
 
+	// forecast retrieval
+	useEffect(() => {
+		const { latitude, longitude } = searchResult.coords;
+
+		if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+			setForecasRetrievalPending(false);
+			setForecasRetrievalMessage('');
+			return;
+		}
+
+		getForecast(searchResult.coords);
+	}, [getForecast, searchResult.coords]);
+
 	const value: GeolocationContextValue = {
 		// state
 		searchbarLocation,
@@ -208,6 +272,9 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 		geolocationRetrievalMessage,
 		recentSearches,
 		isRecentsLoaded,
+		forecastData,
+		forecastRetrievalPending,
+		forecastRetrievalMessage,
 		// handlers
 		handleSearchbarLocation,
 		handleSearchbarLocationType,

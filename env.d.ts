@@ -1,5 +1,11 @@
 interface DailyForecastOutput {
-	location: City;
+	location: {
+		coord: Coordinates;
+		country: string;
+		name: string;
+		sunrise: string;
+		sunset: string;
+	};
 	forecasts: {
 		[date: string]: {
 			humidity: number;
@@ -13,6 +19,17 @@ interface DailyForecastOutput {
 		};
 	};
 	message: string;
+}
+
+interface Forecast {
+	humidity: number;
+	windSpeed: number;
+	minTemp: number;
+	maxTemp: number;
+	avgTemp: number;
+	condition: string;
+	description: string;
+	iconURL: string;
 }
 
 interface CoordinatesOutput {

@@ -6,27 +6,23 @@ import { WindSpeed } from './Conditions/WindSpeed';
 export const ForecastToday = ({ today }: { today: Forecast }) => {
 	return (
 		<section
-			className='rounded-2xl  text-white shadow-[0px_2px_6px_-2px_black] overflow-hidden'
+			className='rounded-2xl min-w-fit text-white shadow-[0px_2px_6px_-2px_black] overflow-hidden'
 			role='article'
 			aria-labelledby='forecast-heading-today'>
 			{/* title and main condition */}
-			<div
-				id='forecast-today-top'
-				className='bg-brand-green px-8 py-2 flex flex-col items-center border-b border-[#007a64]/50'>
+			<div className='bg-brand-green px-8 py-2 flex flex-col items-center border-b border-[#007a64]/50'>
 				<h2
 					className='text-3xl sm:text-4xl font-black mb-2 tracking-wide'
 					id='forecast-heading-today'>
 					TODAY
 				</h2>
-				<p className='text-xl font-medium text-[#c8e6c9] capitalize'>
+				<p className='text-xl font-medium text-[#ddd7c0] capitalize'>
 					{today.description}
 				</p>
 			</div>
 
 			{/* temperature and Icon */}
-			<div
-				id='forecast-today-mid'
-				className='grid grid-cols-2 gap-4 px-8 items-center justify-items-center bg-[#00705e]'>
+			<div className='grid grid-cols-2 gap-4 px-8 items-center justify-items-center bg-[#00705e]'>
 				<div className='flex flex-col items-center pb-4'>
 					<DominantCondition
 						iconURL={today.iconURL}
@@ -45,7 +41,6 @@ export const ForecastToday = ({ today }: { today: Forecast }) => {
 
 			{/* conditions */}
 			<div
-				id='forecast-today-bot'
 				className='bg-[#00332a] p-6 flex justify-around items-center border-t border-[#007a64]'
 				role='complementary'
 				aria-label='Additional conditions for today'>

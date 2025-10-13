@@ -10,6 +10,14 @@ const CoordinateSchema = z.object({
 		.number({ error: 'Longitude must be a number.' })
 		.min(-180, { message: 'Longitude must be -180 or greater.' })
 		.max(180, { message: 'Longitude must be 180 or less.' }),
+	queryToggle: z
+		.string()
+		.transform((s) => s.toLowerCase())
+		.pipe(
+			z.union([z.literal('metric'), z.literal('imperial')], {
+				error: () => ({ message: "queryToggle must be 'metric' or 'imperial'." }),
+			}),
+		),
 });
 
 export async function POST(request: Request) {
@@ -41,7 +49,7 @@ export async function POST(request: Request) {
 		);
 	}
 
-	const { latitude, longitude } = validationResult.data;
+	const { latitude, longitude, queryToggle } = validationResult.data;
 
 	// retrieving the api key from env file
 	const apiKey = process.env.WEATHER_API_KEY;
@@ -67,7 +75,7 @@ export async function POST(request: Request) {
 			`https://api.openweathermap.org/data/2.5/forecast
 			?lat=${latitude}
 			&lon=${longitude}
-			&units=metric
+			&units=${queryToggle}
 			&appid=${apiKey}`,
 		);
 

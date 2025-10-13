@@ -9,6 +9,7 @@ export const ForecastOutlook = ({
 	locationName: string;
 }) => {
 	const sectionLabel = `Five-day forecast outlook for ${locationName}`;
+	const numCards = dailyForecasts.length;
 
 	return (
 		<section
@@ -20,9 +21,15 @@ export const ForecastOutlook = ({
 				5-Day Outlook
 			</h3>
 
-			<ul className='flex flex-wrap gap-5 justify-center'>
+			<ul className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 justify-items-center'>
 				{dailyForecasts.map((day, index) => (
-					<li key={index}>
+					<li
+						key={index}
+						className={`w-full ${
+							numCards % 5 === 1 && index === numCards - 1
+								? 'lg:col-span-full xl:col-span-4 2xl:col-span-5 flex justify-center'
+								: ''
+						}`}>
 						<ForecastCard
 							today={day}
 							index={index + 1}

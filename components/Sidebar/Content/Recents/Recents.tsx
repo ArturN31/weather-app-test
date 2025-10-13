@@ -12,7 +12,6 @@ export const Recents = () => {
 
 	return (
 		<div
-			id='recents'
 			className='text-base font-sans text-gray-200 p-6 bg-dark-brand-green border-t border-[#006652] rounded-xl shadow-xl'
 			role='region'
 			aria-label='Recent Weather Searches'>

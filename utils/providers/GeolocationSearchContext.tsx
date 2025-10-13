@@ -7,13 +7,18 @@ import {
 	useCallback,
 	ReactNode,
 	useEffect,
+	useMemo,
 } from 'react';
 import { useDebounce } from '../hooks/useDebounce';
 import { useRecentSearches } from '../hooks/useRecentSearches';
 
+type LocationType = 'city' | 'postcode';
+type UnitsType = 'metric' | 'imperial';
+
 interface GeolocationContextValue {
 	searchbarLocation: string;
-	searchbarLocationType: 'city' | 'postcode';
+	searchbarLocationType: LocationType;
+	searchbarUnitsType: UnitsType;
 	searchResult: SearchResult;
 	geolocationRetrievalPending: boolean;
 	geolocationRetrievalMessage: string;
@@ -23,7 +28,8 @@ interface GeolocationContextValue {
 	forecastRetrievalPending: boolean;
 	forecastRetrievalMessage: string;
 	handleSearchbarLocation: (location: string) => void;
-	handleSearchbarLocationType: (type: 'city' | 'postcode') => void;
+	handleSearchbarLocationType: (type: LocationType) => void;
+	handleSearchbarUnitsType: (type: UnitsType) => void;
 	handleSearchResult: (location: string, coords: Coordinates) => void;
 	removeRecentSearch: (locationToRemove: string) => void;
 	handleGeolocationRetrievalMessage: (message: string) => void;
@@ -40,9 +46,9 @@ const INITIAL_SEARCH_RESULT: SearchResult = {
 export const GeolocationSearchProvider = ({ children }: { children: ReactNode }) => {
 	// state
 	const [searchbarLocation, setSearchbarLocation] = useState<string>('');
-	const [searchbarLocationType, setSearchbarLocationType] = useState<'city' | 'postcode'>(
-		'city',
-	);
+	const [searchbarLocationType, setSearchbarLocationType] =
+		useState<LocationType>('city');
+	const [searchbarUnitsType, setSearchbarUnitsType] = useState<UnitsType>('metric');
 	const [searchResult, setSearchResult] = useState<SearchResult>(INITIAL_SEARCH_RESULT);
 	const [geolocationRetrievalPending, setGeolocationRetrievalPending] = useState(false);
 	const [geolocationRetrievalMessage, setGeolocationRetrievalMessage] = useState('');
@@ -58,11 +64,25 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 	const debouncedLocation = useDebounce(searchbarLocation, 1000);
 
 	// handlers
-	const handleSearchbarLocation = (location: string) =>
-		setSearchbarLocation(location.toLocaleLowerCase());
+	const handleSearchbarLocation = useCallback(
+		(location: string) => setSearchbarLocation(location.toLocaleLowerCase()),
+		[setSearchbarLocation],
+	);
 
-	const handleSearchbarLocationType = (type: 'city' | 'postcode') =>
-		setSearchbarLocationType(type);
+	const handleSearchbarLocationType = useCallback(
+		(type: LocationType) => setSearchbarLocationType(type),
+		[setSearchbarLocationType],
+	);
+
+	const handleSearchbarUnitsType = useCallback(
+		(type: UnitsType) => setSearchbarUnitsType(type),
+		[setSearchbarUnitsType],
+	);
+
+	const handleGeolocationRetrievalMessage = useCallback(
+		(message: string) => setGeolocationRetrievalMessage(message),
+		[setGeolocationRetrievalMessage],
+	);
 
 	const handleSearchResult = useCallback((location: string, coords: Coordinates) => {
 		setSearchResult((prevResult) => {
@@ -116,11 +136,8 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 		[setRecentSearches],
 	);
 
-	const handleGeolocationRetrievalMessage = (message: string) =>
-		setGeolocationRetrievalMessage(message);
-
 	const getCoordinates = useCallback(
-		async (location: string, toggle: 'city' | 'postcode') => {
+		async (location: string, toggle: LocationType) => {
 			setGeolocationRetrievalPending(true);
 			handleGeolocationRetrievalMessage('Data retrieval pending.');
 
@@ -166,10 +183,10 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 				setGeolocationRetrievalPending(false);
 			}
 		},
-		[handleSearchResult],
+		[handleGeolocationRetrievalMessage, handleSearchResult],
 	);
 
-	const getForecast = useCallback(async (coords: Coordinates) => {
+	const getForecast = useCallback(async (coords: Coordinates, toggle: UnitsType) => {
 		if (typeof coords.latitude !== 'number' || typeof coords.longitude !== 'number')
 			return;
 
@@ -185,6 +202,7 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 				body: JSON.stringify({
 					latitude: coords.latitude,
 					longitude: coords.longitude,
+					queryToggle: toggle,
 				}),
 			});
 
@@ -228,7 +246,13 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 		handleSearchResult('', INVALID_COORDS);
 
 		getCoordinates(location, searchbarLocationType);
-	}, [debouncedLocation, getCoordinates, handleSearchResult, searchbarLocationType]);
+	}, [
+		debouncedLocation,
+		getCoordinates,
+		handleGeolocationRetrievalMessage,
+		handleSearchResult,
+		searchbarLocationType,
+	]);
 
 	// storage update
 	useEffect(() => {
@@ -264,28 +288,51 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 			return;
 		}
 
-		getForecast(searchResult.coords);
-	}, [getForecast, searchResult.coords]);
+		getForecast(searchResult.coords, searchbarUnitsType);
+	}, [getForecast, searchResult.coords, searchbarUnitsType]);
 
-	const value: GeolocationContextValue = {
-		// state
-		searchbarLocation,
-		searchbarLocationType,
-		searchResult,
-		geolocationRetrievalPending,
-		geolocationRetrievalMessage,
-		recentSearches,
-		isRecentsLoaded,
-		forecastData,
-		forecastRetrievalPending,
-		forecastRetrievalMessage,
-		// handlers
-		handleSearchbarLocation,
-		handleSearchbarLocationType,
-		handleSearchResult,
-		removeRecentSearch,
-		handleGeolocationRetrievalMessage,
-	};
+	const value: GeolocationContextValue = useMemo(
+		() => ({
+			// state
+			searchbarLocation,
+			searchbarLocationType,
+			searchbarUnitsType,
+			searchResult,
+			geolocationRetrievalPending,
+			geolocationRetrievalMessage,
+			recentSearches,
+			isRecentsLoaded,
+			forecastData,
+			forecastRetrievalPending,
+			forecastRetrievalMessage,
+			// handlers
+			handleSearchbarLocation,
+			handleSearchbarLocationType,
+			handleSearchbarUnitsType,
+			handleSearchResult,
+			removeRecentSearch,
+			handleGeolocationRetrievalMessage,
+		}),
+		[
+			searchbarLocation,
+			searchbarLocationType,
+			searchbarUnitsType,
+			searchResult,
+			geolocationRetrievalPending,
+			geolocationRetrievalMessage,
+			recentSearches,
+			isRecentsLoaded,
+			forecastData,
+			forecastRetrievalPending,
+			forecastRetrievalMessage,
+			handleSearchbarLocation,
+			handleSearchbarLocationType,
+			handleSearchbarUnitsType,
+			handleSearchResult,
+			removeRecentSearch,
+			handleGeolocationRetrievalMessage,
+		],
+	);
 
 	return (
 		<GeolocationContext.Provider value={value}>{children}</GeolocationContext.Provider>

@@ -1,7 +1,7 @@
 import { useGeolocationSearch } from '@/utils/providers/GeolocationSearchContext';
 import { ForecastLayout } from './ForecastLayout';
 import { ForecastStatus } from './Status/ForecastStatus';
-import { ForecastOutlook } from './ForecastOutlook';
+import { ForecastOutlook } from './Outlook/ForecastOutlook';
 import { ForecastToday } from './ForecastToday';
 import React from 'react';
 

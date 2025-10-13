@@ -34,11 +34,9 @@ export const Sidebar = ({
 			{showOpenButton && <OpenSidebarBtn toggleSidebar={toggleSidebar} />}
 
 			<aside
-				id='weather-sidebar'
 				role='region'
 				aria-label='Search and Recent Locations'
-				aria-hidden={!isSidebarOpen}
-				tabIndex={isSidebarOpen ? 0 : -1}
+				inert={!isSidebarOpen || undefined}
 				className={`fixed top-0 left-0 h-screen w-full sm:w-[400px] p-10 z-50 bg-brand-green shadow-2xl shadow-black/90 border-r border-[#006652] transition-transform duration-500 ease-in-out ${
 					isSidebarOpen ? 'translate-x-0' : '-translate-x-full shadow-none'
 				}`}>

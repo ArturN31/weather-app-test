@@ -26,6 +26,7 @@ interface GeolocationContextValue {
 	handleSearchbarLocationType: (type: 'city' | 'postcode') => void;
 	handleSearchResult: (location: string, coords: Coordinates) => void;
 	removeRecentSearch: (locationToRemove: string) => void;
+	handleGeolocationRetrievalMessage: (message: string) => void;
 }
 
 const GeolocationContext = createContext<GeolocationContextValue | undefined>(undefined);
@@ -115,10 +116,13 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 		[setRecentSearches],
 	);
 
+	const handleGeolocationRetrievalMessage = (message: string) =>
+		setGeolocationRetrievalMessage(message);
+
 	const getCoordinates = useCallback(
 		async (location: string, toggle: 'city' | 'postcode') => {
 			setGeolocationRetrievalPending(true);
-			setGeolocationRetrievalMessage('Data retrieval pending.');
+			handleGeolocationRetrievalMessage('Data retrieval pending.');
 
 			setForecastData(null);
 			setForecasRetrievalPending(false);
@@ -141,13 +145,13 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 				if (!response.ok || data.message) {
 					const errorMsg =
 						data.message || `Server error: ${response.status} ${response.statusText}`;
-					setGeolocationRetrievalMessage(errorMsg);
+					handleGeolocationRetrievalMessage(errorMsg);
 					setGeolocationRetrievalPending(false);
 					handleSearchResult('', INVALID_COORDS);
 					return;
 				}
 
-				setGeolocationRetrievalMessage('');
+				handleGeolocationRetrievalMessage('');
 
 				const newCoords: Coordinates = {
 					latitude: data.latitude,
@@ -157,7 +161,7 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 				handleSearchResult(location, newCoords);
 			} catch (e) {
 				console.log(`Error retrieving coordinates: ${e}`);
-				setGeolocationRetrievalMessage('A critical network error occurred.');
+				handleGeolocationRetrievalMessage('A critical network error occurred.');
 				handleSearchResult('', INVALID_COORDS);
 				setGeolocationRetrievalPending(false);
 			}
@@ -213,9 +217,9 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 			handleSearchResult('', INVALID_COORDS);
 
 			if (!location) {
-				setGeolocationRetrievalMessage('Please enter a location.');
+				handleGeolocationRetrievalMessage('Please enter a location.');
 			} else {
-				setGeolocationRetrievalMessage('Enter at least 3 characters for a location.');
+				handleGeolocationRetrievalMessage('Enter at least 3 characters for a location.');
 			}
 
 			return;
@@ -280,6 +284,7 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 		handleSearchbarLocationType,
 		handleSearchResult,
 		removeRecentSearch,
+		handleGeolocationRetrievalMessage,
 	};
 
 	return (

@@ -14,16 +14,15 @@ export const ForecastOutlook = ({
 		<section
 			role='region'
 			aria-label={sectionLabel}>
-			<h3 className='text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-400 mb-6 border-b border-gray-700 pb-2'>
+			<h3
+				id='outlook-header'
+				className='bg-[#004d40] rounded-xl p-6 shadow-[0px_2px_6px_-2px_black] text-2xl lg:text-3xl font-bold text-white mb-6 border-b border-[#006652]'>
 				5-Day Outlook
 			</h3>
 
-			<ul className='grid xl:flex xl:flex-wrap xl:justify-center gap-4'>
+			<ul className='flex flex-wrap gap-5 justify-center'>
 				{dailyForecasts.map((day, index) => (
-					<li
-						className='w-full xl:w-[450px]'
-						key={index}
-						aria-label={`Forecast for day ${index + 2}`}>
+					<li key={index}>
 						<ForecastCard
 							today={day}
 							index={index + 1}

@@ -2,6 +2,7 @@
 
 import { Forecast } from '@/components/Forecast/Forecast';
 import { Sidebar } from '@/components/Sidebar/Sidebar';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useState } from 'react';
 
 export default function Home() {
@@ -10,11 +11,15 @@ export default function Home() {
 	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
 	return (
-		<div className='flex min-h-screen font-sans'>
+		<div className='flex min-h-screen'>
 			<Sidebar
 				isSidebarOpen={isSidebarOpen}
 				toggleSidebar={toggleSidebar}
 			/>
+
+			<div className='absolute top-5 right-5'>
+				<ThemeToggle />
+			</div>
 
 			<Forecast isSidebarOpen={isSidebarOpen} />
 		</div>

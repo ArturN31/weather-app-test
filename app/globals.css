@@ -1,1 +1,36 @@
 @import 'tailwindcss';
+
+@theme {
+	--color-brand-green: #004d40;
+
+	/* dark mode colours */
+	--color-rich-black: #001514; /* body */
+	--color-dark-brand-green: #003d33;
+	--color-darkest-brand-green: #002922;
+}
+
+.dark body {
+	background-color: var(--color-rich-black);
+}
+
+.dark #weather-sidebar {
+	background-color: var(--color-dark-brand-green);
+}
+
+.dark #recents {
+	background-color: var(--color-darkest-brand-green);
+}
+
+.dark #forecast-today-top {
+	background-color: var(--color-dark-brand-green);
+}
+.dark #forecast-today-mid {
+	background-color: var(--color-brand-green);
+}
+.dark #forecast-today-bot {
+	background-color: var(--color-darkest-brand-green);
+}
+
+.dark #outlook-header {
+	background-color: var(--color-dark-brand-green);
+}

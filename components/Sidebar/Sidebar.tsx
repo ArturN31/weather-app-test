@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Searchbar } from './Content/Searchbar';
+import { Searchbar } from './Content/Searchbar/Searchbar';
 import { MyLocationBtn } from './Content/MyLocationBtn';
 import { Recents } from './Content/Recents/Recents';
 import { CloseSidebarBtn } from './CloseSidebarBtn';
 import { OpenSidebarBtn } from './OpenSidebarBtn';
-import { useGeolocationSearch } from '@/utils/providers/GeolocationSearchContext';
+import { SearchbarStatus } from './Content/Searchbar/SearchbarStatus';
 
 export const Sidebar = ({
 	isSidebarOpen,
@@ -14,9 +14,6 @@ export const Sidebar = ({
 	toggleSidebar: () => void;
 }) => {
 	const [showOpenButton, setShowOpenButton] = useState(!isSidebarOpen);
-
-	const { geolocationRetrievalMessage, geolocationRetrievalPending } =
-		useGeolocationSearch();
 
 	useEffect(() => {
 		let timeoutId: NodeJS.Timeout;
@@ -42,44 +39,25 @@ export const Sidebar = ({
 				aria-label='Search and Recent Locations'
 				aria-hidden={!isSidebarOpen}
 				tabIndex={isSidebarOpen ? 0 : -1}
-				className={`fixed top-0 left-0 h-screen w-full sm:w-[400px] p-10 z-50 bg-[#004d40] text-gray-100 shadow-2xl shadow-[#004d40]/90 border-r border-gray-500 transition-transform duration-500 ease-in-out ${
+				className={`fixed top-0 left-0 h-screen w-full sm:w-[400px] p-10 z-50 bg-brand-green shadow-2xl shadow-black/90 border-r border-[#006652] transition-transform duration-500 ease-in-out ${
 					isSidebarOpen ? 'translate-x-0' : '-translate-x-full shadow-none'
 				}`}>
-				<div className='w-full max-w-sm mx-auto grid gap-5'>
+				<div className='w-full max-w-sm mx-auto grid gap-10'>
 					<CloseSidebarBtn toggleSidebar={toggleSidebar} />
 
 					<h2 className='text-center text-3xl font-serif text-gray-300 tracking-wider border-b border-gray-500 pb-3'>
 						Weather Forecast
 					</h2>
 
-					<div className='grid gap-3 py-10'>
-						{geolocationRetrievalPending && (
-							<div
-								className='text-center'
-								role='status'
-								aria-live='polite'>
-								<p className='text-sm'>{geolocationRetrievalPending}</p>
-							</div>
-						)}
-
-						{geolocationRetrievalMessage && (
-							<div
-								className='text-center'
-								role='alert'
-								aria-live='assertive'>
-								<p className='font-bold'>Attention:</p>
-								<p className='text-sm'>{geolocationRetrievalMessage}</p>
-							</div>
-						)}
+					<div className='grid gap-3'>
+						<SearchbarStatus />
 
 						<Searchbar />
-
 						<p
-							className='text-center text-sm'
+							className='text-center text-sm text-gray-100'
 							aria-hidden='true'>
 							or
 						</p>
-
 						<MyLocationBtn />
 					</div>
 

@@ -1,17 +1,15 @@
-import Image from 'next/image';
 import { Humidity } from './Conditions/Humidity';
 import { WindSpeed } from './Conditions/WindSpeed';
-import { MaxTemp } from './Conditions/MaxTemp';
-import { MinTemp } from './Conditions/MinTemp';
+import { DominantCondition } from './Conditions/DominantCondition';
+import { Temperature } from './Conditions/Temperature';
 
 // get the day label (e.g., "Tomorrow", "Mon", "Tue")
 const getForecastDayLabel = (index: number) => {
-	if (index === -1) return 'Today';
-	if (index === 0) return 'Tomorrow';
+	if (index === 0) return 'Today';
 
 	const date = new Date();
 	date.setDate(date.getDate() + index);
-	return date.toLocaleDateString('en-US', { weekday: 'short' });
+	return date.toLocaleDateString('en-US', { weekday: 'long' });
 };
 
 export const ForecastCard = ({
@@ -24,56 +22,45 @@ export const ForecastCard = ({
 	locationName: string;
 }) => {
 	const dayLabel = getForecastDayLabel(index);
-	const cardTitle = `${dayLabel} in ${locationName}`;
+	const { avgTemp, maxTemp, minTemp, iconURL, description, humidity, windSpeed } = today;
 
 	return (
 		<section
-			className='rounded-xl border border-[#bdbcbc] text-black shadow-[2px_2px_8px_-2px_black]'
+			className='rounded-xl border border-[#bdbcbc] text-black shadow-lg overflow-hidden w-fit'
 			role='article'
 			aria-labelledby={`forecast-heading-${locationName}-${index}`}>
-			<div className='flex gap-10 rounded-xl p-8 justify-center'>
-				<div aria-labelledby={`forecast-heading-${locationName}-${index}`}>
-					<h2
-						className='text-2xl sm:text-3xl font-light mb-4'
-						id={`forecast-heading-${locationName}-${index}`}>
-						{cardTitle}
-					</h2>
+			{/* temperature section */}
+			<div className='grid justify-items-center gap-1 px-4 pt-4 pb-2 bg-neutral-100'>
+				<h2
+					className='text-xl font-bold text-gray-800'
+					id={`forecast-heading-${locationName}-${index}`}>
+					{dayLabel}
+				</h2>
 
-					<div className='flex items-center w-full md:w-auto mb-6 md:mb-0 '>
-						<Image
-							src={today.iconURL || '/placeholder.png'}
-							alt={today.description}
-							aria-hidden='true'
-							width={100}
-							height={100}
-							className='w-16 h-16 sm:w-20 sm:h-20 mr-4 sm:mr-6 flex-shrink-0'
-						/>
-						<div>
-							<div className='flex justify-center items-center gap-2 mb-3'>
-								<p
-									className='text-6xl sm:text-7xl font-bold'
-									aria-label={`Average temperature: ${Math.round(
-										today.avgTemp,
-									)} degrees`}>
-									{Math.round(today.avgTemp)}°
-								</p>
+				<div className='flex items-center gap-2'>
+					<Temperature
+						avgTemp={avgTemp}
+						maxTemp={maxTemp}
+						minTemp={minTemp}
+					/>
+				</div>
+			</div>
 
-								<div>
-									<MaxTemp maxTemp={today.maxTemp} />
-									<MinTemp minTemp={today.minTemp} />
-								</div>
-							</div>
-							<p className='text-xl sm:text-2xl mt-1 capitalize'>{today.description}</p>
-						</div>
-					</div>
+			{/* conditions section */}
+			<div className='grid gap-4 px-4 py-4 bg-neutral-200'>
+				<div className='flex items-center justify-center gap-2'>
+					<DominantCondition
+						iconURL={iconURL}
+						description={description}
+					/>
 				</div>
 
 				<div
-					className='flex flex-col justify-between'
+					className='flex justify-between border-t border-gray-400 pt-3 px-5'
 					role='complementary'
 					aria-label={`Additional conditions for ${dayLabel}`}>
-					<Humidity humidity={today.humidity} />
-					<WindSpeed windSpeed={today.windSpeed} />
+					<Humidity humidity={humidity} />
+					<WindSpeed windSpeed={windSpeed} />
 				</div>
 			</div>
 		</section>

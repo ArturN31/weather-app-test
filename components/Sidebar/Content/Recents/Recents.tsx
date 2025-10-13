@@ -1,6 +1,7 @@
 import { useGeolocationSearch } from '@/utils/providers/GeolocationSearchContext';
 import { RemoveRecentBtn } from './RemoveRecentBtn';
 import { RecentLocationBtn } from './RecentLocationBtn';
+import React from 'react';
 
 export const Recents = () => {
 	const { recentSearches, isRecentsLoaded } = useGeolocationSearch();
@@ -11,15 +12,16 @@ export const Recents = () => {
 
 	return (
 		<div
-			className='text-base font-sans text-gray-200 p-4 bg-[#004d40] border border-gray-600 rounded-sm shadow-[inset_0px_0px_4px_1px_black]'
+			id='recents'
+			className='text-base font-sans text-gray-200 p-6 bg-dark-brand-green border-t border-[#006652] rounded-xl shadow-xl'
 			role='region'
 			aria-label='Recent Weather Searches'>
-			<h3 className='border-b border-gray-600 pb-2 mb-3 text-gray-100 font-semibold'>
-				Recent Search Locations &nbsp;
+			<h3 className='text-xl font-bold text-center border-b border-[#006652] pb-3 mb-4 text-gray-100'>
+				Recent Searches&nbsp;
 				<span
-					className='text-xs'
+					className='text-sm font-normal text-gray-300'
 					aria-hidden='true'>
-					/ Last {MAX_DISPLAY}
+					(Last {MAX_DISPLAY})
 				</span>
 			</h3>
 
@@ -32,7 +34,7 @@ export const Recents = () => {
 						.map((location) => (
 							<li
 								key={location.location}
-								className='flex text-gray-200 shadow-sm transition'>
+								className='flex rounded-md overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,77,64,0.3)] transition hover:scale-[1.01]'>
 								<RecentLocationBtn location={location} />
 								<RemoveRecentBtn locationName={location.location} />
 							</li>
@@ -41,7 +43,9 @@ export const Recents = () => {
 			)}
 
 			{recentSearches.length === 0 && (
-				<p className='text-sm italic text-gray-400/70'>No recent searches found.</p>
+				<p className='text-sm italic text-gray-400/70 text-center'>
+					No recent searches found. Start by searching above.
+				</p>
 			)}
 		</div>
 	);

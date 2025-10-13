@@ -2,9 +2,9 @@ export const OpenSidebarBtn = ({ toggleSidebar }: { toggleSidebar: () => void })
 	return (
 		<button
 			onClick={toggleSidebar}
-			className='fixed top-10 left-10 z-50 p-3 rounded-full bg-[#004d40] text-white shadow-lg border border-gray-700 
+			className='fixed top-10 left-10 z-50 p-3 rounded-full bg-gray-900 text-white shadow-lg border border-gray-700 
                transition duration-150 ease-in-out hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-xl 
-               focus:outline-none focus:ring-4 focus:ring-[#004d40] focus:ring-offset-2 focus:ring-offset-gray-800 cursor-pointer'
+               focus:outline-none focus:ring-4 focus:ring-gray-900 focus:ring-offset-2 focus:ring-offset-gray-800 cursor-pointer'
 			aria-label='Open search and recent locations sidebar'>
 			<svg
 				xmlns='http://www.w3.org/2000/svg'

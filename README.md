@@ -38,7 +38,7 @@ Clone the repository and install the dependencies:
 
 As required, all external API calls are proxied through a Next.js server route to secure the API key.
 
-- Obtain an API key from a weather provider (e.g., OpenWeatherMap).
+- Obtain an API key from a weather provider `https://openweathermap.org/`
 
 - Create a file named `.env.local` in the root of the project directory.
 
@@ -86,11 +86,17 @@ Main Layout prioritises visual fluidity and input usability:
 - The "Open Sidebar" button's state has a 500ms delay via setTimeout. Implemented to precisely match the CSS transition duration, guaranteeing a smooth entry of the button into the viewport.
 - A list of recent searches with unlimited storage, but limited display to preserve all user history while preventing UI clutter. The `useRecentSearches` hook stores all successful searches in `localStorage`. The locations are displayed as pills with keyboard navigation.
 
+**Forecast usability**:
+
+- Forecast data is visually segregated by importance. The Today's Summary is rendered in a large, high-contrast container, immediately highlighting the current conditions and primary temperature, serving as the user's focal point.
+- The 5-Day Outlook is displayed in a responsive flexbox of compact cards. This layout minimises cognitive load by presenting future forecasts in a consistently structured and easily comparable format, optimised for quick scanning and future planning.
+
 ### 5. Clientside Architecture
 
 - The `GeolocationSearchContext` provider completely isolates all geocoding logic (input state, debouncing, API call, loading status, and error messages) from the main UI components. This is a crucial architectural decision that makes the logic unit-testable outside of the React rendering environment.
 - The provider uses the `useDebounce` with a 500ms delay on the `searchbarLocation` state. This prevents excessive and costly API calls while the user is actively typing, optimising resource usage and avoiding potential API rate limits.
 - The `useRecentSearches` hook implemented to manage the history of succesful location lookups. It synchronizes the state with `localStorage`, including logic to safely handle JSON parsing errors and prevent rendering issues.
+- The `useDarkMode` hook is implemented to manage the application's aesthetic state. It synchronizes the preferred theme with `localStorage` and dynamically toggles the dark class on the HTML root element, enabling all Tailwind CSS styles using the dark: prefix.
 
 ## Trade-offs and Limitations
 
@@ -110,5 +116,9 @@ Main Layout prioritises visual fluidity and input usability:
 
 - **Multiple City Results (Limitation)**: The Geocoding API for city names can return up to five locations with the same name. The front-end must be designed to handle this array and potentially prompt the user to select the correct location.
 - **Immediate Geolocation Failures (Limitation)**: The `MyLocationBtn` provides immediate feedback to the user on basic browser permission denial ("Sorry, no position available.") or feature absence ("Geolocation is not supported"). However, it performs no retries or advanced error handling, immediately aborting the attempt upon the first failure.
+
+### 4. Theming
+
+- **Initial Load Flicker (Limitation)**: The light/dark mode persistence is handled client-side using localStorage. On a user's initial visit or after cache clearing, the page may momentarily render in the default (light) theme before the JavaScript can read the stored preference and apply the dark class, resulting in a brief visual flicker
 
 ## Potential Improvements / Further work

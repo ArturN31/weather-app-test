@@ -14,11 +14,7 @@ export const RemoveRecentBtn = ({ locationName }: { locationName: string }) => {
 	return (
 		<button
 			onClick={(e) => handleRemoveClick(e, locationName)}
-			className='bg-gray-900 cursor-pointer text-white p-2 border-l-2 border-gray-900 flex items-center justify-center transition-all hover:bg-red-700 
-                                               // Structural: Added right rounding
-                                               rounded-r-md 
-                                               // Focus: Changed to ring-inset for clean look
-                                               focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-inset'
+			className='bg-gray-900 cursor-pointer text-white p-2 border-l-2 border-gray-900 flex items-center justify-center transition-all hover:bg-red-700 rounded-r-md focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-inset'
 			aria-label={`Remove ${locationName} from recents`}>
 			<svg
 				xmlns='http://www.w3.org/2000/svg'

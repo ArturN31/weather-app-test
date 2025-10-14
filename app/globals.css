@@ -7,6 +7,7 @@
 	--color-rich-black: #001514; /* body */
 	--color-dark-brand-green: #003d33;
 	--color-card: #ddd8d8;
+	--color-card-hover: #c9c0c0d2;
 }
 
 .dark body {
@@ -24,4 +25,17 @@
 
 .dark [id^='forecast-card-conditions-'] {
 	border-color: var(--color-rich-black);
+}
+
+.dark [id$='-suggestions'] {
+	background-color: var(--color-card);
+	color: var(--color-rich-black);
+}
+
+.dark [id*='-suggestions-li-'] {
+	color: var(--color-rich-black);
+}
+
+.dark [id*='-suggestions-li-']:hover {
+	background-color: var(--color-card-hover);
 }

@@ -53,3 +53,7 @@ interface SearchResult {
 	location: string;
 	coords: Coordinates;
 }
+
+interface Location {
+	name: string;
+}

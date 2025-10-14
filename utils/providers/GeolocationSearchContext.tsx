@@ -9,7 +9,6 @@ import {
 	useEffect,
 	useMemo,
 } from 'react';
-import { useDebounce } from '../hooks/useDebounce';
 import { useRecentSearches } from '../hooks/useRecentSearches';
 
 type LocationType = 'city' | 'postcode';
@@ -59,9 +58,6 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 	const [forecastData, setForecastData] = useState<DailyForecastOutput | null>(null);
 	const [forecastRetrievalPending, setForecasRetrievalPending] = useState(false);
 	const [forecastRetrievalMessage, setForecasRetrievalMessage] = useState('');
-
-	// adjust the delay value if necessary
-	const debouncedLocation = useDebounce(searchbarLocation, 1000);
 
 	// handlers
 	const handleSearchbarLocation = useCallback(
@@ -227,9 +223,9 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 		}
 	}, []);
 
-	// handling coordinates retrieval - triggered after debounce
+	// handling coordinates retrieval
 	useEffect(() => {
-		const location = debouncedLocation.trim();
+		const location = searchbarLocation.trim();
 
 		if (!location || location.length < 3) {
 			handleSearchResult('', INVALID_COORDS);
@@ -247,7 +243,7 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 
 		getCoordinates(location, searchbarLocationType);
 	}, [
-		debouncedLocation,
+		searchbarLocation,
 		getCoordinates,
 		handleGeolocationRetrievalMessage,
 		handleSearchResult,
@@ -260,11 +256,11 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 		const { latitude, longitude } = coords;
 
 		if (!location || typeof latitude !== 'number' || typeof longitude !== 'number')
-			return;
+			handleGeolocationRetrievalMessage('Please enter a location.');
 
-		if (location !== debouncedLocation) {
+		if (location !== searchbarLocation) {
 			console.warn(
-				`Ignoring stale search result for storage: ${location}. Current debounced input: ${debouncedLocation}`,
+				`Ignoring stale search result for storage: ${location}. Current input: ${searchbarLocation}`,
 			);
 			return;
 		}
@@ -276,7 +272,13 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 			toggle: searchbarLocationType,
 			coords: coords,
 		});
-	}, [debouncedLocation, searchbarLocationType, updateRecentSearches, searchResult]);
+	}, [
+		searchbarLocation,
+		searchbarLocationType,
+		updateRecentSearches,
+		searchResult,
+		handleGeolocationRetrievalMessage,
+	]);
 
 	// forecast retrieval
 	useEffect(() => {

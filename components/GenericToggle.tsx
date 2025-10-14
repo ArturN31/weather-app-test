@@ -29,7 +29,6 @@ export const GenericToggle = <T extends string>({
 				}}
 				role='radio'
 				aria-checked={selectedValue === option1.value}
-				tabIndex={selectedValue === option1.value ? 0 : -1}
 				className={`w-1/2 py-1 text-sm font-semibold rounded-full transition-all hover:cursor-pointer ${
 					selectedValue === option1.value
 						? 'bg-gray-100 text-[#004d40] shadow-md'
@@ -43,7 +42,6 @@ export const GenericToggle = <T extends string>({
 				}}
 				role='radio'
 				aria-checked={selectedValue === option2.value}
-				tabIndex={selectedValue === option2.value ? 0 : -1}
 				className={`w-1/2 py-1 text-sm font-semibold rounded-full transition-all hover:cursor-pointer ${
 					selectedValue === option2.value
 						? 'bg-gray-100 text-[#004d40] shadow-md'

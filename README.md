@@ -76,6 +76,12 @@ The utility module (`/api/weather/utils.ts`) is dedicated to transforming the ra
 
 This endpoint is responsible for taking a user's location search (city or postcode), validating it using Zod, and securely converting it into the precise latitude and longitude coordinates required for the weather API. It acts as a secure server-side proxy for the OpenWeatherMap Geocoding service.
 
+### 4. Locations API Endpoint (/api/locations)
+
+This endpoint is dedicated to delivering the complete, static list of UK locations to the client application. It performs a one-time server-side read of the `/data/uk_locations.csv` file, converts the raw CSV stream into a clean JSON array of location objects, and returns the full dataset.
+
+Designed to be called only once. By fetching the dataset in a single request, the data can be stored (memoized) in the client's memory. This eliminates network calls for every keystroke, ensuring an instant and highly responsive autocomplete experience for the end-user.
+
 ### 4. Client-Side UX
 
 Main Layout prioritises visual fluidity and input usability:
@@ -85,6 +91,7 @@ Main Layout prioritises visual fluidity and input usability:
 - A dynamic City/Postcode toggle was implemented under the search bar. This ensures input clarity by updating the search bar's placeholder text based on the selected mode, reducing user error in form submission.
 - The "Open Sidebar" button's state has a 500ms delay via setTimeout. Implemented to precisely match the CSS transition duration, guaranteeing a smooth entry of the button into the viewport.
 - A list of recent searches with unlimited storage, but limited display to preserve all user history while preventing UI clutter. The `useRecentSearches` hook stores all successful searches in `localStorage`. The locations are displayed as pills with keyboard navigation.
+- An autocomplete feature that uses list of locations retrieved from `/api/locations`. Suggestions are filtered within the `useSearchbarLogic` hook ensuring accurate and fast matching. Clicking a location immediately updates the input fields and triggers location search, providing forecast output for the location.
 
 **Forecast usability**:
 
@@ -93,8 +100,7 @@ Main Layout prioritises visual fluidity and input usability:
 
 ### 5. Clientside Architecture
 
-- The `GeolocationSearchContext` provider completely isolates all geocoding logic (input state, debouncing, API call, loading status, and error messages) from the main UI components. This is a crucial architectural decision that makes the logic unit-testable outside of the React rendering environment.
-- The provider uses the `useDebounce` with a 500ms delay on the `searchbarLocation` state. This prevents excessive and costly API calls while the user is actively typing, optimising resource usage and avoiding potential API rate limits.
+- The `GeolocationSearchContext` provider completely isolates all geocoding logic (input state, API call, loading status, and error messages) from the main UI components. This is a crucial architectural decision that makes the logic unit-testable outside of the React rendering environment.
 - The `useRecentSearches` hook implemented to manage the history of succesful location lookups. It synchronizes the state with `localStorage`, including logic to safely handle JSON parsing errors and prevent rendering issues.
 - The `useDarkMode` hook is implemented to manage the application's aesthetic state. It synchronizes the preferred theme with `localStorage` and dynamically toggles the dark class on the HTML root element, enabling all Tailwind CSS styles using the dark: prefix.
 

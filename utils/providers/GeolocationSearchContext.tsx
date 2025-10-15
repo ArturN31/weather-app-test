@@ -19,19 +19,17 @@ interface GeolocationContextValue {
 	searchbarLocationType: LocationType;
 	searchbarUnitsType: UnitsType;
 	searchResult: SearchResult;
-	geolocationRetrievalPending: boolean;
-	geolocationRetrievalMessage: string;
 	recentSearches: StoredLocation[];
 	isRecentsLoaded: boolean;
 	forecastData: DailyForecastOutput | null;
-	forecastRetrievalPending: boolean;
-	forecastRetrievalMessage: string;
+	geolocationStatus: RetrievalStatus;
+	forecastStatus: RetrievalStatus;
 	handleSearchbarLocation: (location: string) => void;
 	handleSearchbarLocationType: (type: LocationType) => void;
 	handleSearchbarUnitsType: (type: UnitsType) => void;
 	handleSearchResult: (location: string, coords: Coordinates) => void;
 	removeRecentSearch: (locationToRemove: string) => void;
-	handleGeolocationRetrievalMessage: (message: string) => void;
+	handleGeolocationStatus: (isPending: boolean, message: string) => void;
 }
 
 const GeolocationContext = createContext<GeolocationContextValue | undefined>(undefined);
@@ -42,6 +40,11 @@ const INITIAL_SEARCH_RESULT: SearchResult = {
 	coords: INVALID_COORDS,
 };
 
+const INITIAL_RETRIEVAL_STATUS: RetrievalStatus = {
+	isPending: false,
+	message: '',
+};
+
 export const GeolocationSearchProvider = ({ children }: { children: ReactNode }) => {
 	// state
 	const [searchbarLocation, setSearchbarLocation] = useState<string>('');
@@ -49,15 +52,18 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 		useState<LocationType>('city');
 	const [searchbarUnitsType, setSearchbarUnitsType] = useState<UnitsType>('metric');
 	const [searchResult, setSearchResult] = useState<SearchResult>(INITIAL_SEARCH_RESULT);
-	const [geolocationRetrievalPending, setGeolocationRetrievalPending] = useState(false);
-	const [geolocationRetrievalMessage, setGeolocationRetrievalMessage] = useState('');
 	const [recentSearches, setRecentSearches, isRecentsLoaded] = useRecentSearches<
 		StoredLocation[]
 	>('recent_location_searches', []);
 
 	const [forecastData, setForecastData] = useState<DailyForecastOutput | null>(null);
-	const [forecastRetrievalPending, setForecasRetrievalPending] = useState(false);
-	const [forecastRetrievalMessage, setForecasRetrievalMessage] = useState('');
+
+	const [geolocationStatus, setGeolocationStatus] = useState<RetrievalStatus>(
+		INITIAL_RETRIEVAL_STATUS,
+	);
+	const [forecastStatus, setForecastStatus] = useState<RetrievalStatus>(
+		INITIAL_RETRIEVAL_STATUS,
+	);
 
 	// handlers
 	const handleSearchbarLocation = useCallback(
@@ -75,10 +81,13 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 		[setSearchbarUnitsType],
 	);
 
-	const handleGeolocationRetrievalMessage = useCallback(
-		(message: string) => setGeolocationRetrievalMessage(message),
-		[setGeolocationRetrievalMessage],
-	);
+	const handleGeolocationStatus = useCallback((isPending: boolean, message: string) => {
+		setGeolocationStatus({ isPending, message });
+	}, []);
+
+	// const handleForecastStatus = useCallback((isPending: boolean, message: string) => {
+	// 	setForecastStatus({ isPending, message });
+	// }, []);
 
 	const handleSearchResult = useCallback((location: string, coords: Coordinates) => {
 		setSearchResult((prevResult) => {
@@ -134,12 +143,10 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 
 	const getCoordinates = useCallback(
 		async (location: string, toggle: LocationType) => {
-			setGeolocationRetrievalPending(true);
-			handleGeolocationRetrievalMessage('Data retrieval pending.');
+			setGeolocationStatus({ isPending: true, message: 'Data retrieval pending.' });
 
 			setForecastData(null);
-			setForecasRetrievalPending(false);
-			setForecasRetrievalMessage('');
+			setForecastStatus({ isPending: false, message: '' });
 
 			try {
 				const response = await fetch('/api/geolocation', {
@@ -158,13 +165,12 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 				if (!response.ok || data.message) {
 					const errorMsg =
 						data.message || `Server error: ${response.status} ${response.statusText}`;
-					handleGeolocationRetrievalMessage(errorMsg);
-					setGeolocationRetrievalPending(false);
+					setGeolocationStatus({ isPending: false, message: errorMsg });
 					handleSearchResult('', INVALID_COORDS);
 					return;
 				}
 
-				handleGeolocationRetrievalMessage('');
+				setGeolocationStatus({ isPending: false, message: '' });
 
 				const newCoords: Coordinates = {
 					latitude: data.latitude,
@@ -174,20 +180,21 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 				handleSearchResult(location, newCoords);
 			} catch (e) {
 				console.log(`Error retrieving coordinates: ${e}`);
-				handleGeolocationRetrievalMessage('A critical network error occurred.');
+				setGeolocationStatus({
+					isPending: false,
+					message: 'A critical network error occurred.',
+				});
 				handleSearchResult('', INVALID_COORDS);
-				setGeolocationRetrievalPending(false);
 			}
 		},
-		[handleGeolocationRetrievalMessage, handleSearchResult],
+		[handleSearchResult],
 	);
 
 	const getForecast = useCallback(async (coords: Coordinates, toggle: UnitsType) => {
 		if (typeof coords.latitude !== 'number' || typeof coords.longitude !== 'number')
 			return;
 
-		setForecasRetrievalPending(true);
-		setForecasRetrievalMessage('Data retrieval pending.');
+		setForecastStatus({ isPending: true, message: 'Data retrieval pending.' });
 
 		try {
 			const response = await fetch('/api/weather', {
@@ -207,18 +214,18 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 			if (!response.ok || data.message) {
 				const errorMsg =
 					data.message || `Server error: ${response.status} ${response.statusText}`;
-				setForecasRetrievalMessage(errorMsg);
-				setForecasRetrievalPending(false);
+				setForecastStatus({ isPending: false, message: errorMsg });
 				return;
 			}
 
 			setForecastData(data);
-			setForecasRetrievalPending(false);
-			setForecasRetrievalMessage('');
+			setForecastStatus({ isPending: false, message: '' });
 		} catch (e) {
 			console.log(`Error retrieving forecast: ${e}`);
-			setForecasRetrievalMessage('A critical network error occurred.');
-			setForecasRetrievalPending(false);
+			setForecastStatus({
+				isPending: false,
+				message: 'A critical network error occured.',
+			});
 			setForecastData(null);
 		}
 	}, []);
@@ -231,24 +238,20 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 			handleSearchResult('', INVALID_COORDS);
 
 			if (!location) {
-				handleGeolocationRetrievalMessage('Please enter a location.');
+				setGeolocationStatus({ isPending: false, message: 'Please enter a location.' });
 			} else {
-				handleGeolocationRetrievalMessage('Enter at least 3 characters for a location.');
+				setGeolocationStatus({
+					isPending: false,
+					message: 'Enter at least 3 characters for a location',
+				});
 			}
 
 			return;
 		}
 
 		handleSearchResult('', INVALID_COORDS);
-
 		getCoordinates(location, searchbarLocationType);
-	}, [
-		searchbarLocation,
-		getCoordinates,
-		handleGeolocationRetrievalMessage,
-		handleSearchResult,
-		searchbarLocationType,
-	]);
+	}, [searchbarLocation, getCoordinates, handleSearchResult, searchbarLocationType]);
 
 	// storage update
 	useEffect(() => {
@@ -256,7 +259,7 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 		const { latitude, longitude } = coords;
 
 		if (!location || typeof latitude !== 'number' || typeof longitude !== 'number')
-			handleGeolocationRetrievalMessage('Please enter a location.');
+			return;
 
 		if (location !== searchbarLocation) {
 			console.warn(
@@ -265,28 +268,21 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 			return;
 		}
 
-		setGeolocationRetrievalPending(false);
+		setForecastStatus({ isPending: false, message: '' });
 
 		updateRecentSearches({
 			location: location,
 			toggle: searchbarLocationType,
 			coords: coords,
 		});
-	}, [
-		searchbarLocation,
-		searchbarLocationType,
-		updateRecentSearches,
-		searchResult,
-		handleGeolocationRetrievalMessage,
-	]);
+	}, [searchbarLocation, searchbarLocationType, updateRecentSearches, searchResult]);
 
 	// forecast retrieval
 	useEffect(() => {
 		const { latitude, longitude } = searchResult.coords;
 
 		if (typeof latitude !== 'number' || typeof longitude !== 'number') {
-			setForecasRetrievalPending(false);
-			setForecasRetrievalMessage('');
+			setForecastStatus({ isPending: false, message: '' });
 			return;
 		}
 
@@ -300,39 +296,35 @@ export const GeolocationSearchProvider = ({ children }: { children: ReactNode })
 			searchbarLocationType,
 			searchbarUnitsType,
 			searchResult,
-			geolocationRetrievalPending,
-			geolocationRetrievalMessage,
 			recentSearches,
 			isRecentsLoaded,
 			forecastData,
-			forecastRetrievalPending,
-			forecastRetrievalMessage,
+			forecastStatus,
+			geolocationStatus,
 			// handlers
 			handleSearchbarLocation,
 			handleSearchbarLocationType,
 			handleSearchbarUnitsType,
 			handleSearchResult,
 			removeRecentSearch,
-			handleGeolocationRetrievalMessage,
+			handleGeolocationStatus,
 		}),
 		[
 			searchbarLocation,
 			searchbarLocationType,
 			searchbarUnitsType,
 			searchResult,
-			geolocationRetrievalPending,
-			geolocationRetrievalMessage,
 			recentSearches,
 			isRecentsLoaded,
 			forecastData,
-			forecastRetrievalPending,
-			forecastRetrievalMessage,
+			geolocationStatus,
+			forecastStatus,
 			handleSearchbarLocation,
 			handleSearchbarLocationType,
 			handleSearchbarUnitsType,
 			handleSearchResult,
 			removeRecentSearch,
-			handleGeolocationRetrievalMessage,
+			handleGeolocationStatus,
 		],
 	);
 

@@ -1,15 +1,10 @@
 import { useGeolocationSearch } from '@/utils/providers/GeolocationSearchContext';
 
 export const MyLocationBtn = () => {
-	const { handleSearchResult, handleGeolocationRetrievalMessage } =
-		useGeolocationSearch();
+	const { handleSearchResult, handleGeolocationStatus } = useGeolocationSearch();
 
 	const handleClick = () => {
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(success, error);
-		} else {
-			handleGeolocationRetrievalMessage('Geolocation is not supported by this browser.');
-		}
+		navigator.geolocation.getCurrentPosition(success, error);
 	};
 
 	const success = (position: GeolocationPosition) => {
@@ -19,11 +14,11 @@ export const MyLocationBtn = () => {
 		};
 
 		handleSearchResult('', coords);
-		handleGeolocationRetrievalMessage('');
+		handleGeolocationStatus(false, '');
 	};
 
 	const error = (e: GeolocationPositionError) =>
-		handleGeolocationRetrievalMessage(`Sorry, no position available. ${e.message}`);
+		handleGeolocationStatus(false, `Sorry, no position available. ${e.message}`);
 
 	return (
 		<button

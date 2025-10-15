@@ -2,28 +2,10 @@
 interface RawForecastResponse {
 	list: ForecastItem[];
 	city: {
-		name: string;
+		coord: Coordinates;
 		country: string;
+		name: string;
 	};
-}
-
-// represents a single 3-hour forecast entry from the API 'list' array
-interface ForecastItem {
-	main: {
-		temp: number;
-		temp_min: number;
-		temp_max: number;
-		humidity: number;
-	};
-	weather: Array<{
-		description: string;
-		main: string;
-		icon: string;
-	}>;
-	wind: {
-		speed: number;
-	};
-	dt_txt: string; // Time of data forecasted, ISO, UTC
 }
 
 // represents the final forecast summary for a single calendar day
@@ -165,5 +147,6 @@ export function processToDailySummaryObject(
 	return {
 		location: rawResponse.city,
 		forecasts: forecasts,
+		message: '',
 	};
 }

@@ -5,9 +5,9 @@ export const useSearchbarLogic = () => {
 	const {
 		searchbarLocation,
 		searchbarLocationType,
-		geolocationRetrievalPending,
+		geolocationStatus,
 		handleSearchbarLocation,
-		handleGeolocationRetrievalMessage,
+		handleGeolocationStatus,
 	} = useGeolocationSearch();
 
 	const [autocompleteState, setAutocompleteState] = useState<{
@@ -49,11 +49,22 @@ export const useSearchbarLogic = () => {
 	const fetchLocations = useCallback(async () => {
 		if (searchbarLocationType !== 'city') return;
 
+		if (searchbarLocation.trim().length < 3) {
+			setAutocompleteState((prev) => ({
+				...prev,
+				locationsRetrievalPending: false,
+			}));
+			// DO NOT call handleGeolocationStatus(false, '') here,
+			// as it will immediately clear the "Please enter a location" message
+			// set by the provider's useEffect.
+			return;
+		}
+
 		setAutocompleteState((prev) => ({
 			...prev,
 			locationsRetrievalPending: true,
 		}));
-		handleGeolocationRetrievalMessage('');
+		handleGeolocationStatus(false, '');
 
 		try {
 			const response = await fetch('/api/locations');
@@ -63,7 +74,7 @@ export const useSearchbarLogic = () => {
 					allLocations: [],
 					locationsRetrievalPending: false,
 				});
-				handleGeolocationRetrievalMessage('Failed to fetch locations for autocomplete.');
+				handleGeolocationStatus(false, 'Failed to fetch locations for autocomplete.');
 				return;
 			}
 
@@ -72,16 +83,16 @@ export const useSearchbarLogic = () => {
 				allLocations: data,
 				locationsRetrievalPending: false,
 			});
-			handleGeolocationRetrievalMessage('');
+			handleGeolocationStatus(false, '');
 		} catch (error) {
 			console.error('Error fetching locations for autocomplete:', error);
 			setAutocompleteState((prev) => ({
 				...prev,
 				locationsRetrievalPending: false,
 			}));
-			handleGeolocationRetrievalMessage(`Error fetching locations: ${error}`);
+			handleGeolocationStatus(false, `Error fetching locations: ${error}`);
 		}
-	}, [handleGeolocationRetrievalMessage, searchbarLocationType]);
+	}, [handleGeolocationStatus, searchbarLocation, searchbarLocationType]);
 
 	const SUGGESTIONS_OUTPUT_LIMIT = 8;
 	const suggestions = useMemo(() => {
@@ -100,14 +111,14 @@ export const useSearchbarLogic = () => {
 	}, [localInput, searchbarLocationType, autocompleteState]);
 
 	const showSuggestions =
-		suggestions.length > 0 && !geolocationRetrievalPending && !suggestionHidden;
+		suggestions.length > 0 && !geolocationStatus.isPending && !suggestionHidden;
 
 	const currentPlaceholder = `Enter ${
 		searchbarLocationType === 'city' ? 'City Name' : 'Postcode'
 	}...`;
 
 	const isInputDisabled =
-		geolocationRetrievalPending ||
+		geolocationStatus.isPending ||
 		(searchbarLocationType === 'city' && autocompleteState.locationsRetrievalPending);
 
 	const isSubmitDisabled = localInput.trim().length === 0 || isInputDisabled;
@@ -134,7 +145,7 @@ export const useSearchbarLogic = () => {
 		handleSuggestionClick,
 		handleInputChange,
 		// context Values
-		geolocationRetrievalPending,
+		geolocationStatus,
 		searchbarLocationType,
 		searchbarLocation,
 	};

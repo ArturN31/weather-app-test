@@ -1,10 +1,27 @@
+// represents a single 3-hour forecast entry from the API 'list' array
+interface ForecastItem {
+	main: {
+		temp: number;
+		temp_min: number;
+		temp_max: number;
+		humidity: number;
+	};
+	weather: Array<{
+		description: string;
+		main: string;
+		icon: string;
+	}>;
+	wind: {
+		speed: number;
+	};
+	dt_txt: string; // Time of data forecasted, ISO, UTC
+}
+
 interface DailyForecastOutput {
 	location: {
 		coord: Coordinates;
 		country: string;
 		name: string;
-		sunrise: string;
-		sunset: string;
 	};
 	forecasts: {
 		[date: string]: {
@@ -52,6 +69,11 @@ interface StoredLocation {
 interface SearchResult {
 	location: string;
 	coords: Coordinates;
+}
+
+interface RetrievalStatus {
+	isPending: boolean;
+	message: string;
 }
 
 interface Location {

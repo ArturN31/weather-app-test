@@ -41,8 +41,7 @@ export const ForecastToday = ({ today }: { today: Forecast }) => {
 
 			{/* conditions */}
 			<div
-				className='bg-[#00332a] p-6 flex justify-around items-center border-t border-[#007a64]'
-				role='complementary'
+				className='bg-[#023f34] p-6 flex justify-around items-center'
 				aria-label='Additional conditions for today'>
 				<Humidity humidity={today.humidity} />
 				<WindSpeed windSpeed={today.windSpeed} />

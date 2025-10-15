@@ -82,7 +82,7 @@ This endpoint is dedicated to delivering the complete, static list of UK locatio
 
 Designed to be called only once. By fetching the dataset in a single request, the data can be stored (memoized) in the client's memory. This eliminates network calls for every keystroke, ensuring an instant and highly responsive autocomplete experience for the end-user.
 
-### 4. Client-Side UX
+### 5. Client-Side UX
 
 Main Layout prioritises visual fluidity and input usability:
 
@@ -97,8 +97,9 @@ Main Layout prioritises visual fluidity and input usability:
 
 - Forecast data is visually segregated by importance. The Today's Summary is rendered in a large, high-contrast container, immediately highlighting the current conditions and primary temperature, serving as the user's focal point.
 - The 5-Day Outlook is displayed in a responsive flexbox of compact cards. This layout minimises cognitive load by presenting future forecasts in a consistently structured and easily comparable format, optimised for quick scanning and future planning.
+- A dynamic temperature line chart is rendered below the 5-Day Outlook. This feature visually maps the aggregated `min_temp` and `max_temp` values across the entire five-day forecast. Provides a quick, intuitive visualization of the overall temperature trend and volatility for the week ahead.
 
-### 5. Clientside Architecture
+### 6. Clientside Architecture
 
 - The `GeolocationSearchContext` provider completely isolates all geocoding logic (input state, API call, loading status, and error messages) from the main UI components. This is a crucial architectural decision that makes the logic unit-testable outside of the React rendering environment.
 - The `useRecentSearches` hook implemented to manage the history of succesful location lookups. It synchronizes the state with `localStorage`, including logic to safely handle JSON parsing errors and prevent rendering issues.
@@ -128,3 +129,8 @@ Main Layout prioritises visual fluidity and input usability:
 - **Initial Load Flicker (Limitation)**: The light/dark mode persistence is handled client-side using localStorage. On a user's initial visit or after cache clearing, the page may momentarily render in the default (light) theme before the JavaScript can read the stored preference and apply the dark class, resulting in a brief visual flicker
 
 ## Potential Improvements / Further work
+
+- Address aforementioned Limitations and Trade-offs.
+- Introduce a unit testing framework (e.g., Jest ) to test API utilities, React hooks, and components.
+- Currently geolocation and location suggestions are limited to GB, therefore it would be nice to expand those.
+- Audit and improve security for API endpoints.

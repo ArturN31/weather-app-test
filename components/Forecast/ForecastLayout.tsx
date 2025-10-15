@@ -17,9 +17,7 @@ export const ForecastLayout = ({
 	return (
 		<main
 			className={`${
-				isSidebarOpen
-					? 'xl:ml-[400px] lg:p-10'
-					: 'md:pl-[130px] md:pr-[130px] md:pt-[40px] pt-[130px]'
+				isSidebarOpen ? 'xl:ml-[400px]' : 'md:ml-[130px] md:mr-[130px] md:mt-0 mt-[114px]'
 			} flex-1 min-h-screen p-4 sm:p-6 transition-all duration-500 ease-in-out`}>
 			<div className='max-w-[1500px] mx-auto'>
 				<h1 className='text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-500 border-b border-gray-600 pb-2 capitalize'>

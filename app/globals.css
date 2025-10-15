@@ -18,6 +18,35 @@
 	background-color: var(--color-dark-brand-green);
 }
 
+.dark #temperature-chart {
+	background-color: var(--color-card);
+}
+
+.dark #temperature-chart > h3,
+.dark #temperature-chart > h3 > div > span {
+	color: #000;
+}
+
+.dark #temperature-chart > h3:hover {
+	background-color: var(--color-card-hover);
+}
+
+.dark #temperature-chart .recharts-layer .recharts-label-list text {
+	fill: #000;
+}
+
+.dark #temperature-chart .recharts-legend-wrapper span span {
+	color: #000 !important;
+}
+
+.dark #temperature-chart .recharts-xAxis tspan {
+	fill: #000 !important;
+}
+
+.dark #temperature-chart .recharts-yAxis tspan {
+	fill: #000 !important;
+}
+
 .dark [id^='forecast-card-'] {
 	background-color: var(--color-card);
 	color: var(--color-rich-black);

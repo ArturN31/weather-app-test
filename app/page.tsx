@@ -11,7 +11,7 @@ export default function Home() {
 	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
 	return (
-		<div className='flex min-h-screen'>
+		<div className='min-h-screen'>
 			<Sidebar
 				isSidebarOpen={isSidebarOpen}
 				toggleSidebar={toggleSidebar}
